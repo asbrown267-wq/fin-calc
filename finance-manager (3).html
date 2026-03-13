@@ -1,0 +1,1116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Finance Manager</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-attachment: fixed;
+            min-height: 100vh;
+            padding: 10px;
+        }
+
+        @media (min-width: 768px) {
+            body {
+                padding: 20px;
+            }
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .content {
+            padding: 20px;
+        }
+
+        @media (min-width: 768px) {
+            .content {
+                padding: 30px;
+            }
+        }
+
+        .workflow-step {
+            background: #f7fafc;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-left: 5px solid #667eea;
+        }
+
+        .workflow-step h2 {
+            color: #2d3748;
+            font-size: 18px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .step-number {
+            background: #667eea;
+            color: white;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .amount-box {
+            background: white;
+            border: 3px solid;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 15px 0;
+        }
+
+        .amount-box.critical {
+            border-color: #e53e3e;
+            background: linear-gradient(135deg, #fff5f5 0%, #fed7d7 100%);
+        }
+
+        .amount-box.important {
+            border-color: #ed8936;
+            background: linear-gradient(135deg, #fffaf0 0%, #feebc8 100%);
+        }
+
+        .amount-box.success {
+            border-color: #48bb78;
+            background: linear-gradient(135deg, #f0fff4 0%, #c6f6d5 100%);
+        }
+
+        .amount-box.info {
+            border-color: #4299e1;
+            background: linear-gradient(135deg, #ebf8ff 0%, #bee3f8 100%);
+        }
+
+        .amount-box h3 {
+            font-size: 14px;
+            margin-bottom: 10px;
+            color: #2d3748;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .amount-box .amount {
+            font-size: 42px;
+            font-weight: 700;
+            margin: 10px 0;
+        }
+
+        .amount-box.critical .amount {
+            color: #c53030;
+        }
+
+        .amount-box.important .amount {
+            color: #c05621;
+        }
+
+        .amount-box.success .amount {
+            color: #2f855a;
+        }
+
+        .amount-box.info .amount {
+            color: #2c5282;
+        }
+
+        .amount-box .note {
+            font-size: 13px;
+            color: #4a5568;
+            margin-top: 10px;
+            line-height: 1.5;
+        }
+
+        .dropdown-toggle {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .dropdown-toggle:hover {
+            background: #5568d3;
+        }
+
+        .dropdown-content {
+            display: none;
+            margin-top: 10px;
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .dropdown-content.active {
+            display: block;
+        }
+
+        .payment-item {
+            padding: 10px;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .payment-item:last-child {
+            border-bottom: none;
+        }
+
+        .payment-name {
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .payment-day {
+            font-size: 12px;
+            color: #718096;
+            margin-top: 3px;
+        }
+
+        .payment-amount {
+            font-size: 18px;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #cbd5e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #4a5568;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 6px rgba(102, 126, 234, 0.3);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        button.small {
+            padding: 8px 16px;
+            font-size: 14px;
+        }
+
+        button.delete {
+            background: #e53e3e;
+            box-shadow: 0 2px 4px rgba(229, 62, 62, 0.3);
+        }
+
+        button.delete:hover {
+            background: #c53030;
+        }
+
+        button.edit {
+            background: #4299e1;
+            box-shadow: 0 2px 4px rgba(66, 153, 225, 0.3);
+            margin-right: 5px;
+        }
+
+        button.edit:hover {
+            background: #3182ce;
+        }
+
+        .tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            font-weight: 600;
+            color: #6c757d;
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+            background: white;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .input-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1.2fr auto;
+            gap: 10px;
+            margin-bottom: 10px;
+            align-items: center;
+        }
+
+        @media (max-width: 768px) {
+            .input-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .entry-item {
+            background: white;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid #e2e8f0;
+        }
+
+        .entry-info {
+            flex: 1;
+        }
+
+        .entry-name {
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .entry-details {
+            font-size: 13px;
+            color: #718096;
+            margin-top: 3px;
+        }
+
+        .entry-amount {
+            font-size: 18px;
+            font-weight: 700;
+            color: #667eea;
+            margin: 0 15px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .debt-item {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .debt-info {
+            flex: 1;
+        }
+
+        .debt-name {
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 8px;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        @media (max-width: 768px) {
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .summary-total {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+            margin-top: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>💰 Finance Manager</h1>
+            <p>Your monthly money workflow - clear and simple</p>
+        </div>
+
+        <div class="tabs">
+            <div class="tab active" onclick="switchTab('workflow')">My Workflow</div>
+            <div class="tab" onclick="switchTab('payments')">Manage Payments</div>
+            <div class="tab" onclick="switchTab('debts')">Savings & Debts</div>
+        </div>
+
+        <!-- WORKFLOW TAB -->
+        <div id="workflow" class="tab-content active">
+            <div class="content">
+                
+                <!-- STEP 1: Starting Point -->
+                <div class="workflow-step">
+                    <h2><span class="step-number">1</span> Starting Point - What I've Been Paid</h2>
+                    <label>Payday Date</label>
+                    <input type="date" id="payday" onchange="calculate()">
+                    <label style="margin-top: 15px;">Amount Paid (£)</label>
+                    <input type="number" id="balance" step="0.01" placeholder="0.00" oninput="calculate()">
+                    <label style="margin-top: 15px;">Work Reimbursements (£) <span style="font-size: 12px; color: #718096;">(Phone & Internet)</span></label>
+                    <input type="number" id="reimbursements" step="0.01" placeholder="48.00" value="0" oninput="calculate()">
+                </div>
+
+                <!-- STEP 2: Secure This Month -->
+                <div class="workflow-step">
+                    <h2><span class="step-number">2</span> Secure Money for Rest of This Month</h2>
+                    
+                    <div class="amount-box critical">
+                        <h3>🏦 Must Stay in Halifax (This Month)</h3>
+                        <div class="amount" id="halifaxThisMonth">£0.00</div>
+                        <div class="note">DO NOT TOUCH - Covers remaining Halifax direct debits this month</div>
+                        
+                        <button class="dropdown-toggle" onclick="toggleDropdown('halifaxThisMonthList')">
+                            <span>View Remaining Halifax Payments</span>
+                            <span id="halifaxThisMonthCount">0 payments</span>
+                        </button>
+                        <div class="dropdown-content" id="halifaxThisMonthList"></div>
+                    </div>
+
+                    <div class="grid-2">
+                        <div class="amount-box important">
+                            <h3>💳 Monzo (This Month)</h3>
+                            <div class="amount" id="monzoThisMonth">£0.00</div>
+                            <button class="dropdown-toggle" onclick="toggleDropdown('monzoThisMonthList')">
+                                <span>View Payments</span>
+                                <span id="monzoThisMonthCount">0</span>
+                            </button>
+                            <div class="dropdown-content" id="monzoThisMonthList"></div>
+                        </div>
+
+                        <div class="amount-box important">
+                            <h3>🎀 Daughter (This Month)</h3>
+                            <div class="amount" id="daughterThisMonth">£0.00</div>
+                            <button class="dropdown-toggle" onclick="toggleDropdown('daughterThisMonthList')">
+                                <span>View Payments</span>
+                                <span id="daughterThisMonthCount">0</span>
+                            </button>
+                            <div class="dropdown-content" id="daughterThisMonthList"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- STEP 3: Plan Next Month -->
+                <div class="workflow-step">
+                    <h2><span class="step-number">3</span> Calculate Next Month's Needs</h2>
+                    
+                    <div class="amount-box critical">
+                        <h3>🏦 Halifax Direct Debits (Next Month)</h3>
+                        <div class="amount" id="halifaxNextMonth">£0.00</div>
+                        <div class="note">Must REMAIN in Halifax for next month's direct debits</div>
+                        
+                        <button class="dropdown-toggle" onclick="toggleDropdown('halifaxNextMonthList')">
+                            <span>View All Halifax Direct Debits</span>
+                            <span id="halifaxNextMonthCount">0 payments</span>
+                        </button>
+                        <div class="dropdown-content" id="halifaxNextMonthList"></div>
+                    </div>
+
+                    <div class="amount-box info">
+                        <h3>💳 Transfer to Monzo (Next Month)</h3>
+                        <div class="amount" id="monzoNextMonth">£0.00</div>
+                        <div class="note">Food shop & general spending for next month</div>
+                        
+                        <button class="dropdown-toggle" onclick="toggleDropdown('monzoNextMonthList')">
+                            <span>View Monzo Payments</span>
+                            <span id="monzoNextMonthCount">0 payments</span>
+                        </button>
+                        <div class="dropdown-content" id="monzoNextMonthList"></div>
+                    </div>
+                </div>
+
+                <!-- STEP 4: Daughter's Savings -->
+                <div class="workflow-step">
+                    <h2><span class="step-number">4</span> Daughter's Savings</h2>
+                    
+                    <div class="amount-box success">
+                        <h3>🎀 Transfer to Halifax Daughter's Saver</h3>
+                        <div class="amount" id="daughterSavings">£0.00</div>
+                        <div class="note">Next month's daughter savings amount</div>
+                    </div>
+                </div>
+
+                <!-- STEP 5: Final Surplus -->
+                <div class="workflow-step">
+                    <h2><span class="step-number">5</span> Surplus to Monzo Savings</h2>
+                    
+                    <div class="amount-box success">
+                        <h3>✨ Surplus to Transfer to Monzo Savings</h3>
+                        <div class="amount" id="surplus">£0.00</div>
+                        <div class="note">
+                            After securing Halifax (this month + next month), transferring Monzo spend, and daughter's savings - this is what's left to save.
+                        </div>
+                    </div>
+
+                    <div style="background: #edf2f7; padding: 15px; border-radius: 8px; margin-top: 15px;">
+                        <h4 style="margin-bottom: 10px; color: #2d3748;">💡 Calculation Breakdown:</h4>
+                        <div style="font-size: 14px; color: #4a5568; line-height: 1.8;">
+                            <div style="display: flex; justify-content: space-between; padding: 5px 0;">
+                                <span>Amount Paid + Reimbursements:</span>
+                                <strong id="totalIn">£0.00</strong>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; padding: 5px 0;">
+                                <span>- Halifax (rest of this month):</span>
+                                <strong id="calcHalifax1">£0.00</strong>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; padding: 5px 0;">
+                                <span>- Monzo (rest of this month):</span>
+                                <strong id="calcMonzo1">£0.00</strong>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; padding: 5px 0;">
+                                <span>- Daughter (rest of this month):</span>
+                                <strong id="calcDaughter1">£0.00</strong>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; padding: 5px 0;">
+                                <span>- Halifax (next month):</span>
+                                <strong id="calcHalifax2">£0.00</strong>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; padding: 5px 0;">
+                                <span>- Monzo (next month):</span>
+                                <strong id="calcMonzo2">£0.00</strong>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; padding: 5px 0;">
+                                <span>- Daughter (next month):</span>
+                                <strong id="calcDaughter2">£0.00</strong>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; padding: 10px 0; border-top: 2px solid #cbd5e0; margin-top: 5px;">
+                                <span style="font-weight: 700;">= Surplus:</span>
+                                <strong id="calcSurplus" style="color: #48bb78; font-size: 18px;">£0.00</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- PAYMENTS TAB -->
+        <div id="payments" class="tab-content">
+            <div class="content">
+                <div class="workflow-step">
+                    <h2>Add Monthly Payment</h2>
+                    <div class="input-row">
+                        <input type="text" id="name" placeholder="Name (e.g., Rent)">
+                        <input type="number" id="amount" step="0.01" placeholder="£0.00">
+                        <input type="number" id="day" min="1" max="31" placeholder="Day (1-31)">
+                        <select id="account">
+                            <option value="halifax">Halifax</option>
+                            <option value="monzo">Monzo</option>
+                            <option value="daughter">Daughter</option>
+                        </select>
+                        <button onclick="addEntry()">Add</button>
+                    </div>
+                </div>
+
+                <div class="workflow-step">
+                    <h2>Filter & Sort</h2>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;">
+                        <input type="text" id="filterName" placeholder="Filter by name..." oninput="renderEntries()">
+                        <select id="sortBy" onchange="renderEntries()">
+                            <option value="">Sort by...</option>
+                            <option value="name">Name (A-Z)</option>
+                            <option value="name-desc">Name (Z-A)</option>
+                            <option value="amount">Amount (Low to High)</option>
+                            <option value="amount-desc">Amount (High to Low)</option>
+                            <option value="day">Day (1-31)</option>
+                            <option value="day-desc">Day (31-1)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="workflow-step">
+                    <h2>Your Monthly Payments (<span id="entryCount">0</span>)</h2>
+                    <div id="entriesList"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- DEBTS TAB -->
+        <div id="debts" class="tab-content">
+            <div class="content">
+                <div class="workflow-step">
+                    <h2><span class="step-number">6</span> Final Step - Check Debt Position</h2>
+                    
+                    <label>Total Savings Amount (£)</label>
+                    <input type="number" id="currentSavings" step="0.01" placeholder="0.00" oninput="calculateDebtStatus()">
+                </div>
+
+                <div class="workflow-step">
+                    <h2>Add Debt</h2>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr auto; gap: 10px; align-items: end;">
+                        <input type="text" id="debtName" placeholder="Debt name">
+                        <input type="number" id="debtAmount" step="0.01" placeholder="Amount owed (£)">
+                        <button onclick="addDebt()">Add Debt</button>
+                    </div>
+                </div>
+
+                <div class="workflow-step">
+                    <h2>Your Debts</h2>
+                    <div id="debtsList"></div>
+                </div>
+
+                <div class="amount-box success" id="debtStatusBox">
+                    <h3>Overall Financial Position</h3>
+                    <div class="amount" id="netPosition">£0.00</div>
+                    <div class="note" id="statusText"></div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Edit Modal -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <h3 style="margin-bottom: 20px; color: #2d3748;">Edit Payment</h3>
+            <div style="margin-bottom: 15px;">
+                <label>Name</label>
+                <input type="text" id="editName">
+            </div>
+            <div style="margin-bottom: 15px;">
+                <label>Amount (£)</label>
+                <input type="number" id="editAmount" step="0.01">
+            </div>
+            <div style="margin-bottom: 15px;">
+                <label>Day (1-31)</label>
+                <input type="number" id="editDay" min="1" max="31">
+            </div>
+            <div style="margin-bottom: 15px;">
+                <label>Account</label>
+                <select id="editAccount">
+                    <option value="halifax">Halifax</option>
+                    <option value="monzo">Monzo</option>
+                    <option value="daughter">Daughter</option>
+                </select>
+            </div>
+            <div style="display: flex; gap: 10px; margin-top: 20px; justify-content: flex-end;">
+                <button onclick="closeEditModal()" style="background: #a0aec0;">Cancel</button>
+                <button onclick="saveEdit()">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let entries = [];
+        let debts = [
+            { name: 'Leyla', amount: 0 },
+            { name: 'Credit Card', amount: 0 },
+            { name: 'Monzo Flex', amount: 0 },
+            { name: 'Very', amount: 0 }
+        ];
+        let editingIndex = -1;
+        
+        // Load data
+        function loadData() {
+            const saved = localStorage.getItem('financeEntries');
+            const savedDebts = localStorage.getItem('financeDebts');
+            const savedBalance = localStorage.getItem('balance');
+            const savedReimbursements = localStorage.getItem('reimbursements');
+            const savedCurrentSavings = localStorage.getItem('currentSavings');
+            const savedPayday = localStorage.getItem('payday');
+            
+            if (saved) entries = JSON.parse(saved);
+            if (savedDebts) debts = JSON.parse(savedDebts);
+            if (savedBalance) document.getElementById('balance').value = savedBalance;
+            if (savedReimbursements) document.getElementById('reimbursements').value = savedReimbursements;
+            if (savedCurrentSavings) document.getElementById('currentSavings').value = savedCurrentSavings;
+            if (savedPayday) {
+                document.getElementById('payday').value = savedPayday;
+            } else {
+                document.getElementById('payday').value = new Date().toISOString().split('T')[0];
+            }
+            
+            renderEntries();
+            renderDebts();
+            calculate();
+            calculateDebtStatus();
+        }
+
+        // Save data
+        function saveData() {
+            localStorage.setItem('financeEntries', JSON.stringify(entries));
+            localStorage.setItem('financeDebts', JSON.stringify(debts));
+            localStorage.setItem('balance', document.getElementById('balance').value);
+            localStorage.setItem('reimbursements', document.getElementById('reimbursements').value);
+            localStorage.setItem('currentSavings', document.getElementById('currentSavings').value);
+            localStorage.setItem('payday', document.getElementById('payday').value);
+        }
+
+        // Switch tabs
+        function switchTab(tab) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            event.target.classList.add('active');
+            document.getElementById(tab).classList.add('active');
+        }
+
+        // Toggle dropdown
+        function toggleDropdown(id) {
+            const dropdown = document.getElementById(id);
+            dropdown.classList.toggle('active');
+        }
+
+        // Render payment list
+        function renderPaymentList(payments, containerId) {
+            const container = document.getElementById(containerId);
+            if (payments.length === 0) {
+                container.innerHTML = '<p style="color: #718096; padding: 10px;">No payments</p>';
+                return;
+            }
+            
+            const sorted = payments.sort((a, b) => a.day - b.day);
+            let total = 0;
+            
+            container.innerHTML = sorted.map(p => {
+                total += p.amount;
+                return `
+                    <div class="payment-item">
+                        <div>
+                            <div class="payment-name">${p.name}</div>
+                            <div class="payment-day">Day ${p.day}</div>
+                        </div>
+                        <div class="payment-amount">£${p.amount.toFixed(2)}</div>
+                    </div>
+                `;
+            }).join('') + `
+                <div class="summary-total">
+                    <span>TOTAL</span>
+                    <span style="color: #667eea; font-size: 20px;">£${total.toFixed(2)}</span>
+                </div>
+            `;
+        }
+
+        // Add entry
+        function addEntry() {
+            const name = document.getElementById('name').value.trim();
+            const amount = parseFloat(document.getElementById('amount').value);
+            const day = parseInt(document.getElementById('day').value);
+            const account = document.getElementById('account').value;
+
+            if (!name || isNaN(amount) || isNaN(day) || day < 1 || day > 31) {
+                alert('Please fill in all fields correctly');
+                return;
+            }
+
+            entries.push({ name, amount, day, account });
+            
+            document.getElementById('name').value = '';
+            document.getElementById('amount').value = '';
+            document.getElementById('day').value = '';
+            
+            saveData();
+            renderEntries();
+            calculate();
+        }
+
+        // Open edit modal
+        function openEditModal(index) {
+            editingIndex = index;
+            const entry = entries[index];
+            
+            document.getElementById('editName').value = entry.name;
+            document.getElementById('editAmount').value = entry.amount;
+            document.getElementById('editDay').value = entry.day;
+            document.getElementById('editAccount').value = entry.account;
+            
+            document.getElementById('editModal').classList.add('active');
+        }
+
+        // Close edit modal
+        function closeEditModal() {
+            document.getElementById('editModal').classList.remove('active');
+            editingIndex = -1;
+        }
+
+        // Save edit
+        function saveEdit() {
+            if (editingIndex === -1) return;
+
+            const name = document.getElementById('editName').value.trim();
+            const amount = parseFloat(document.getElementById('editAmount').value);
+            const day = parseInt(document.getElementById('editDay').value);
+            const account = document.getElementById('editAccount').value;
+
+            if (!name || isNaN(amount) || isNaN(day) || day < 1 || day > 31) {
+                alert('Please fill in all fields correctly');
+                return;
+            }
+
+            entries[editingIndex] = { name, amount, day, account };
+            
+            closeEditModal();
+            saveData();
+            renderEntries();
+            calculate();
+        }
+
+        // Delete entry
+        function deleteEntry(index) {
+            if (confirm('Delete this payment?')) {
+                entries.splice(index, 1);
+                saveData();
+                renderEntries();
+                calculate();
+            }
+        }
+
+        // Render entries with filter and sort
+        function renderEntries() {
+            const list = document.getElementById('entriesList');
+            const count = document.getElementById('entryCount');
+            const filterName = document.getElementById('filterName').value.toLowerCase();
+            const sortBy = document.getElementById('sortBy').value;
+            
+            // Filter
+            let filtered = entries.filter(e => e.name.toLowerCase().includes(filterName));
+            
+            // Sort
+            if (sortBy) {
+                const [field, order] = sortBy.includes('-desc') 
+                    ? [sortBy.replace('-desc', ''), 'desc'] 
+                    : [sortBy, 'asc'];
+                
+                filtered.sort((a, b) => {
+                    let aVal = a[field];
+                    let bVal = b[field];
+                    
+                    if (typeof aVal === 'string') {
+                        aVal = aVal.toLowerCase();
+                        bVal = bVal.toLowerCase();
+                    }
+                    
+                    if (order === 'desc') {
+                        return bVal > aVal ? 1 : -1;
+                    } else {
+                        return aVal > bVal ? 1 : -1;
+                    }
+                });
+            } else {
+                filtered.sort((a, b) => a.day - b.day);
+            }
+            
+            count.textContent = entries.length;
+            
+            if (filtered.length === 0) {
+                list.innerHTML = '<p style="color: #718096; text-align: center; padding: 20px;">No payments found.</p>';
+                return;
+            }
+            
+            list.innerHTML = filtered.map(entry => {
+                const originalIndex = entries.indexOf(entry);
+                const accountLabel = entry.account === 'halifax' ? 'Halifax' : 
+                                   entry.account === 'monzo' ? 'Monzo' : 'Daughter';
+                return `
+                    <div class="entry-item">
+                        <div class="entry-info">
+                            <div class="entry-name">${entry.name}</div>
+                            <div class="entry-details">Day ${entry.day} • ${accountLabel}</div>
+                        </div>
+                        <div class="entry-amount">£${entry.amount.toFixed(2)}</div>
+                        <button class="small edit" onclick="openEditModal(${originalIndex})">Edit</button>
+                        <button class="small delete" onclick="deleteEntry(${originalIndex})">Delete</button>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Add debt
+        function addDebt() {
+            const name = document.getElementById('debtName').value.trim();
+            const amount = parseFloat(document.getElementById('debtAmount').value);
+
+            if (!name || isNaN(amount)) {
+                alert('Please fill in both name and amount');
+                return;
+            }
+
+            debts.push({ name, amount });
+            
+            document.getElementById('debtName').value = '';
+            document.getElementById('debtAmount').value = '';
+
+            saveData();
+            renderDebts();
+            calculateDebtStatus();
+        }
+
+        // Delete debt
+        function deleteDebt(index) {
+            if (confirm('Delete this debt?')) {
+                debts.splice(index, 1);
+                saveData();
+                renderDebts();
+                calculateDebtStatus();
+            }
+        }
+
+        // Update debt amount
+        function updateDebtAmount(index, value) {
+            debts[index].amount = parseFloat(value) || 0;
+            saveData();
+            calculateDebtStatus();
+        }
+
+        // Render debts
+        function renderDebts() {
+            const list = document.getElementById('debtsList');
+            
+            if (debts.length === 0) {
+                list.innerHTML = '<p style="color: #718096; text-align: center; padding: 20px;">No debts added yet.</p>';
+                return;
+            }
+            
+            list.innerHTML = debts.map((debt, index) => `
+                <div class="debt-item">
+                    <div class="debt-info">
+                        <div class="debt-name">${debt.name}</div>
+                        <input type="number" step="0.01" value="${debt.amount}" 
+                               onchange="updateDebtAmount(${index}, this.value)"
+                               style="width: 150px; margin-top: 5px;">
+                    </div>
+                    <div>
+                        <div style="font-size: 20px; font-weight: 700; color: #e53e3e; margin-bottom: 10px;">
+                            £${debt.amount.toFixed(2)}
+                        </div>
+                        <button class="small delete" onclick="deleteDebt(${index})">Delete</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Calculate debt status
+        function calculateDebtStatus() {
+            const savings = parseFloat(document.getElementById('currentSavings').value) || 0;
+            const totalDebt = debts.reduce((sum, debt) => sum + debt.amount, 0);
+            const netPosition = savings - totalDebt;
+
+            const netEl = document.getElementById('netPosition');
+            const statusEl = document.getElementById('statusText');
+            const statusBox = document.getElementById('debtStatusBox');
+
+            netEl.textContent = '£' + Math.abs(netPosition).toFixed(2);
+            
+            if (netPosition > 0) {
+                statusBox.className = 'amount-box success';
+                statusEl.textContent = 'You are in CREDIT - Your savings exceed your debts by this amount.';
+            } else if (netPosition < 0) {
+                statusBox.className = 'amount-box critical';
+                statusEl.textContent = 'You are in DEBT - Your debts exceed your savings by this amount.';
+            } else {
+                statusBox.className = 'amount-box important';
+                statusEl.textContent = 'You are BALANCED - Your savings exactly match your debts.';
+            }
+
+            saveData();
+        }
+
+        // Main calculation
+        function calculate() {
+            const balance = parseFloat(document.getElementById('balance').value) || 0;
+            const reimbursements = parseFloat(document.getElementById('reimbursements').value) || 0;
+            const payday = new Date(document.getElementById('payday').value);
+            const today = payday.getDate();
+
+            const effectiveBalance = balance + reimbursements;
+
+            // THIS MONTH remaining payments
+            let halifaxThisMonth = [];
+            let monzoThisMonth = [];
+            let daughterThisMonth = [];
+
+            entries.forEach(entry => {
+                if (entry.day >= today) {
+                    if (entry.account === 'halifax') halifaxThisMonth.push(entry);
+                    else if (entry.account === 'monzo') monzoThisMonth.push(entry);
+                    else if (entry.account === 'daughter') daughterThisMonth.push(entry);
+                }
+            });
+
+            // NEXT MONTH all payments
+            let halifaxNextMonth = [];
+            let monzoNextMonth = [];
+            let daughterNextMonth = [];
+
+            entries.forEach(entry => {
+                if (entry.account === 'halifax') halifaxNextMonth.push(entry);
+                else if (entry.account === 'monzo') monzoNextMonth.push(entry);
+                else if (entry.account === 'daughter') daughterNextMonth.push(entry);
+            });
+
+            // Calculate totals
+            const halifaxThisMonthTotal = halifaxThisMonth.reduce((sum, p) => sum + p.amount, 0);
+            const monzoThisMonthTotal = monzoThisMonth.reduce((sum, p) => sum + p.amount, 0);
+            const daughterThisMonthTotal = daughterThisMonth.reduce((sum, p) => sum + p.amount, 0);
+
+            const halifaxNextMonthTotal = halifaxNextMonth.reduce((sum, p) => sum + p.amount, 0);
+            const monzoNextMonthTotal = monzoNextMonth.reduce((sum, p) => sum + p.amount, 0);
+            const daughterNextMonthTotal = daughterNextMonth.reduce((sum, p) => sum + p.amount, 0);
+
+            // Update displays
+            document.getElementById('halifaxThisMonth').textContent = '£' + halifaxThisMonthTotal.toFixed(2);
+            document.getElementById('monzoThisMonth').textContent = '£' + monzoThisMonthTotal.toFixed(2);
+            document.getElementById('daughterThisMonth').textContent = '£' + daughterThisMonthTotal.toFixed(2);
+
+            document.getElementById('halifaxNextMonth').textContent = '£' + halifaxNextMonthTotal.toFixed(2);
+            document.getElementById('monzoNextMonth').textContent = '£' + monzoNextMonthTotal.toFixed(2);
+            document.getElementById('daughterSavings').textContent = '£' + daughterNextMonthTotal.toFixed(2);
+
+            // Update counts
+            document.getElementById('halifaxThisMonthCount').textContent = halifaxThisMonth.length + ' payments';
+            document.getElementById('monzoThisMonthCount').textContent = monzoThisMonth.length + ' payments';
+            document.getElementById('daughterThisMonthCount').textContent = daughterThisMonth.length + ' payments';
+
+            document.getElementById('halifaxNextMonthCount').textContent = halifaxNextMonth.length + ' payments';
+            document.getElementById('monzoNextMonthCount').textContent = monzoNextMonth.length + ' payments';
+
+            // Render payment lists
+            renderPaymentList(halifaxThisMonth, 'halifaxThisMonthList');
+            renderPaymentList(monzoThisMonth, 'monzoThisMonthList');
+            renderPaymentList(daughterThisMonth, 'daughterThisMonthList');
+            renderPaymentList(halifaxNextMonth, 'halifaxNextMonthList');
+            renderPaymentList(monzoNextMonth, 'monzoNextMonthList');
+
+            // Calculate surplus
+            const surplus = effectiveBalance 
+                - halifaxThisMonthTotal 
+                - monzoThisMonthTotal 
+                - daughterThisMonthTotal
+                - halifaxNextMonthTotal 
+                - monzoNextMonthTotal 
+                - daughterNextMonthTotal;
+
+            document.getElementById('surplus').textContent = '£' + surplus.toFixed(2);
+
+            // Update breakdown
+            document.getElementById('totalIn').textContent = '£' + effectiveBalance.toFixed(2);
+            document.getElementById('calcHalifax1').textContent = '£' + halifaxThisMonthTotal.toFixed(2);
+            document.getElementById('calcMonzo1').textContent = '£' + monzoThisMonthTotal.toFixed(2);
+            document.getElementById('calcDaughter1').textContent = '£' + daughterThisMonthTotal.toFixed(2);
+            document.getElementById('calcHalifax2').textContent = '£' + halifaxNextMonthTotal.toFixed(2);
+            document.getElementById('calcMonzo2').textContent = '£' + monzoNextMonthTotal.toFixed(2);
+            document.getElementById('calcDaughter2').textContent = '£' + daughterNextMonthTotal.toFixed(2);
+            document.getElementById('calcSurplus').textContent = '£' + surplus.toFixed(2);
+
+            saveData();
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('editModal');
+            if (event.target === modal) {
+                closeEditModal();
+            }
+        }
+
+        // Initialize
+        loadData();
+    </script>
+</body>
+</html>
